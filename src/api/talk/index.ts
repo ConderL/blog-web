@@ -8,12 +8,14 @@ import { Talk } from "./types";
  * @param params 查询条件
  * @returns 说说列表
  */
-export function getTalkList(params: PageQuery): AxiosPromise<Result<PageResult<Talk[]>>> {
-  return request({
-    url: "/talk/list",
-    method: "get",
-    params,
-  });
+export function getTalkList(
+	params: PageQuery
+): AxiosPromise<Result<PageResult<Talk[]>>> {
+	return request({
+		url: "/talk/list",
+		method: "get",
+		params,
+	});
 }
 
 /**
@@ -21,10 +23,10 @@ export function getTalkList(params: PageQuery): AxiosPromise<Result<PageResult<T
  * @returns 首页说说
  */
 export function getTalkHomeList(): AxiosPromise<Result<string[]>> {
-  return request({
-    url: "/home/talk",
-    method: "get",
-  });
+	return request({
+		url: "/talk/home",
+		method: "get",
+	});
 }
 
 /**
@@ -32,10 +34,10 @@ export function getTalkHomeList(): AxiosPromise<Result<string[]>> {
  * @returns 说说
  */
 export function getTalk(talkId: number): AxiosPromise<Result<Talk>> {
-  return request({
-    url: `/talk/${talkId}`,
-    method: "get",
-  });
+	return request({
+		url: `/talk/${talkId}`,
+		method: "get",
+	});
 }
 
 /**
@@ -43,8 +45,8 @@ export function getTalk(talkId: number): AxiosPromise<Result<Talk>> {
  * @param talkId 说说id
  */
 export function likeTalk(talkId: number): AxiosPromise<Result<null>> {
-  return request({
-    url: `/talk/${talkId}/like`,
-    method: "post",
-  });
+	return request({
+		url: `/talk/${talkId}/like`,
+		method: "post",
+	});
 }

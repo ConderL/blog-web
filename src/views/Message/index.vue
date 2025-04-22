@@ -3,30 +3,51 @@
 	<div class="message-container">
 		<h1 class="message-title">留言板</h1>
 		<div class="message-input">
-			<input class="input" v-model="messageContent" @click="show = true" @keyup.enter="send"
-				   placeholder="说点什么吧"/>
+			<input
+				class="input"
+				v-model="messageContent"
+				@click="show = true"
+				@keyup.enter="send"
+				placeholder="说点什么吧"
+			/>
 			<button class="send" @click="send" v-show="show">发送</button>
 		</div>
 	</div>
 	<!-- 弹幕列表 -->
-	<div class="danmaku-container"
-		 :style="{'background-image': 'url(' + blog.blogInfo.siteConfig.messageWallpaper +')'}">
-		<vue-danmaku ref="danmaku" class="danmaku" use-slot v-model:danmus="messageList" :is-suspend="true">
+	<div
+		class="danmaku-container"
+		:style="{
+			'background-image':
+				'url(' + blog.blogInfo.siteConfig.messageWallpaper + ')',
+		}"
+	>
+		<vue-danmaku
+			ref="danmaku"
+			class="danmaku"
+			use-slot
+			v-model:danmus="messageList"
+			:is-suspend="true"
+		>
 			<template v-slot:dm="{ danmu }">
-        <span class="danmaku-item">
-          <img :src="danmu.avatar" width="30" height="30" style="border-radius: 50%"/>
-          <span class="ml">{{ danmu.nickname }} :</span>
-          <span class="ml">{{ danmu.messageContent }}</span>
-        </span>
+				<span class="danmaku-item">
+					<img
+						:src="danmu.avatar"
+						width="30"
+						height="30"
+						style="border-radius: 50%"
+					/>
+					<span class="ml">{{ danmu.nickname }} :</span>
+					<span class="ml">{{ danmu.messageContent }}</span>
+				</span>
 			</template>
 		</vue-danmaku>
 	</div>
 </template>
 
 <script setup lang="ts">
-import {addMessage, getMessageList} from "@/api/message";
-import {Message} from "@/api/message/types";
-import {useBlogStore, useUserStore} from "@/store";
+import { addMessage, getMessageList } from "@/api/message";
+import { Message } from "@/api/message/types";
+import { useBlogStore, useUserStore } from "@/store";
 import vueDanmaku from "vue3-danmaku";
 
 const user = useUserStore();
@@ -36,7 +57,8 @@ const show = ref(false);
 const danmaku = ref();
 const messageList = ref<Message[]>([]);
 onMounted(async () => {
-	await getMessageList().then(({data}) => {
+	await getMessageList().then(({ data }) => {
+		console.log(data);
 		messageList.value = data.data;
 	});
 });
@@ -45,14 +67,16 @@ const send = () => {
 		window.$message?.warning("留言内容不能为空");
 		return false;
 	}
-	const userAvatar = user.avatar ? user.avatar : blog.blogInfo.siteConfig.touristAvatar;
+	const userAvatar = user.avatar
+		? user.avatar
+		: blog.blogInfo.siteConfig.touristAvatar;
 	const userNickname = user.nickname ? user.nickname : "游客";
 	let message = {
 		avatar: userAvatar,
 		nickname: userNickname,
 		messageContent: messageContent.value,
 	};
-	addMessage(message).then(({data}) => {
+	addMessage(message).then(({ data }) => {
 		if (data.flag) {
 			if (blog.blogInfo.siteConfig.messageCheck) {
 				window.$message?.warning("留言成功，正在审核中");

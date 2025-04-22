@@ -39,7 +39,7 @@ export function getArticleRecommend(): AxiosPromise<
 	Result<ArticleRecommend[]>
 > {
 	return request({
-		url: "/article/recommend",
+		url: "/articles/recommend",
 		method: "get",
 	});
 }
