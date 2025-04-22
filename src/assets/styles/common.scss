@@ -14,15 +14,15 @@
 	z-index: -9;
 
 	&::after {
-		content: '';
+		content: "";
 		display: block;
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background-color: rgba(0, 0, 0, .2);
-		transition: all .2s ease-in-out 0s;
+		background-color: rgba(0, 0, 0, 0.2);
+		transition: all 0.2s ease-in-out 0s;
 	}
 }
 
@@ -158,7 +158,7 @@
 }
 
 .colorFlag {
-	cursor: pointer;
+	@include cursor-pointer;
 	color: var(--grey-6);
 }
 
@@ -194,8 +194,12 @@
 .n-pagination-item:hover,
 .n-pagination-item--active {
 	color: var(--grey-0) !important;
-	background-image: linear-gradient(to right, var(--color-pink) 0, var(--color-orange) 100%) !important;
-	box-shadow: 0 0 .75rem var(--color-pink-a3) !important;
+	background-image: linear-gradient(
+		to right,
+		var(--color-pink) 0,
+		var(--color-orange) 100%
+	) !important;
+	box-shadow: 0 0 0.75rem var(--color-pink-a3) !important;
 	border: none !important;
 }
 
@@ -217,7 +221,11 @@
 .loading-warp .btn {
 	letter-spacing: 1.25px;
 	color: var(--grey-0) !important;
-	background-image: linear-gradient(to right, var(--color-pink) 0, var(--color-orange) 100%);
+	background-image: linear-gradient(
+		to right,
+		var(--color-pink) 0,
+		var(--color-orange) 100%
+	);
 }
 
 /* 文章标签 */
@@ -280,12 +288,12 @@
 
 	.reply-box-send {
 		@include flex;
+		@include cursor-pointer;
 		flex-basis: 70px;
 		margin-left: 10px;
 		border-radius: 4px;
 		background-color: var(--comment-btn);
 		color: var(--grey-0);
-		cursor: pointer;
 	}
 
 	.send-active {
@@ -433,7 +441,7 @@
 		max-height: 12.5rem;
 		padding: 1px;
 		border-radius: 0.25rem;
-		cursor: pointer;
+		cursor: url(../icons/link.cur), default !important;
 		object-fit: cover;
 	}
 }

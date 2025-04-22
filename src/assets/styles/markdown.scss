@@ -1,5 +1,4 @@
 @media (max-width: 567px) {
-
 	.md h1,
 	.md h2,
 	.md h3,
@@ -11,7 +10,8 @@
 }
 
 .md {
-	font-family: Mulish, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+	font-family: Mulish, -apple-system, "PingFang SC", "Microsoft YaHei",
+		sans-serif;
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 }
@@ -76,7 +76,7 @@
 	counter-reset: counter;
 }
 
-.md ol>li::before {
+.md ol > li::before {
 	counter-increment: counter;
 	content: counter(counter);
 	position: absolute;
@@ -90,20 +90,20 @@
 	left: -1.8em;
 	background: var(--primary-color);
 	color: var(--grey-1);
-	cursor: pointer;
+	cursor: url(../icons/link.cur);
 }
 
-.md ol>li:hover::before {
+.md ol > li:hover::before {
 	color: var(--grey-1);
 	background: var(--color-pink);
 }
 
-.md li ul>li::before {
+.md li ul > li::before {
 	background: var(--grey-1);
 	border: 1px solid var(--primary-color);
 }
 
-.md li ol>li::before {
+.md li ol > li::before {
 	content: counter(counter) ".";
 	background: 0 0;
 	color: var(--primary-color);
@@ -111,7 +111,7 @@
 	line-height: 1;
 }
 
-.md li ol>li:hover::before {
+.md li ol > li:hover::before {
 	background: 0 0;
 	color: var(--color-pink);
 }
@@ -142,12 +142,12 @@ dt {
 }
 
 .md dl dt:hover::before,
-.md ul>li:hover::before {
+.md ul > li:hover::before {
 	background: var(--color-pink);
 }
 
 .md dl dt::before,
-.md ul>li::before {
+.md ul > li::before {
 	content: "";
 	position: absolute;
 	width: 0.4em;
@@ -190,10 +190,10 @@ dt {
 }
 
 // code样式
-:not(pre)>code {
+:not(pre) > code {
 	color: var(--primary-color) !important;
 	border-radius: 0.3rem !important;
-	border: 0.0625rem solid rgba(0, 0, 0, .1);
+	border: 0.0625rem solid rgba(0, 0, 0, 0.1);
 	background-color: var(--grey-0) !important;
 	padding: 0.2rem 0.3rem !important;
 	word-wrap: break-word;
@@ -221,7 +221,7 @@ dt {
 	background: #fc625d;
 	-webkit-box-shadow: 20px 0 #fdbc40, 40px 0 #35cd4b;
 	box-shadow: 20px 0 #fdbc40, 40px 0 #35cd4b;
-	content: ' ';
+	content: " ";
 }
 
 .md code {
@@ -230,7 +230,6 @@ dt {
 }
 
 @media (max-width: 419px) {
-
 	.v-md-pre-wrapper {
 		margin: 0 !important;
 		border-radius: 6px !important;

@@ -9,3 +9,12 @@
 	top: 0;
 	left: 0;
 }
+@mixin cursor-pointer {
+	cursor: url(../icons/link.cur), default;
+}
+@mixin cursor-default {
+	cursor: url(../icons/pointer.cur), default;
+}
+@mixin cursor-ban {
+	cursor: url(../icons/ban.cur), default;
+}

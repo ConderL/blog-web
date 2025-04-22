@@ -15,7 +15,8 @@ body {
 	cursor: url("../icons/normal.cur"), default;
 	background: var(--grey-0);
 	color: var(--text-color);
-	font-family: Mulish, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+	font-family: Mulish, -apple-system, "PingFang SC", "Microsoft YaHei",
+		sans-serif;
 	font-size: 1em;
 	overflow-x: hidden;
 	line-height: 2;
@@ -47,8 +48,23 @@ textarea {
 	border-style: none;
 }
 
+input,
+textarea {
+	cursor: url(../icons/text.cur), default !important;
+}
+
 li {
 	list-style: none;
+}
+
+.n-pagination-item--disabled {
+	color: rgba(194, 194, 194, 1);
+	cursor: url(../icons/ban.cur), default !important;
+}
+
+.swiper-button-next,
+.n-pagination-item--clickable {
+	cursor: url(../icons/link.cur), default !important;
 }
 
 a {
@@ -59,7 +75,7 @@ a {
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 	transition: all 0.2s ease-in-out 0s;
-	cursor: pointer;
+	cursor: url(../icons/link.cur), default !important;
 }
 
 .clearfix:after {
