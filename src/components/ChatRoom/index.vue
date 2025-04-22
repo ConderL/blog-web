@@ -2,27 +2,59 @@
 	<div v-if="blog.blogInfo.siteConfig.isChat">
 		<div class="chat-container" v-show="show">
 			<div class="chat-header">
-				<img width="32" height="32" src="https://picture.qiuyu.wiki/common/chat.png"/>
-				<div style="margin-left:12px">
+				<img
+					width="32"
+					height="32"
+					src="https://picture.qiuyu.wiki/common/chat.png"
+				/>
+				<div style="margin-left: 12px">
 					<div>聊天室</div>
-					<div style="font-size:12px">当前{{ onlineCount }}人在线</div>
+					<div style="font-size: 12px">
+						当前{{ onlineCount }}人在线
+					</div>
 				</div>
-				<svg-icon class="close" icon-class="close" size="1.2rem" @click="show = false"></svg-icon>
+				<svg-icon
+					class="close"
+					icon-class="close"
+					size="1.2rem"
+					@click="show = false"
+				></svg-icon>
 			</div>
 			<div class="chat-content" id="chat-content">
-				<div class="chat-item" v-for="(chat, index) of recordList  " :class="isMy(chat) ? 'my-chat' : ''">
-					<img class="user-avatar" :src="chat.avatar" alt="">
+				<div
+					class="chat-item"
+					v-for="(chat, index) of recordList"
+					:class="isMy(chat) ? 'my-chat' : ''"
+				>
+					<img class="user-avatar" :src="chat.avatar" alt="" />
 					<div :class="isMy(chat) ? 'right-info' : 'left-info'">
-						<div class="user-info" :class="isMy(chat) ? 'my-chat' : ''">
-							<span style="color: var(--color-red);">{{ chat.nickname }}</span>
-							<span style="color :var(--color-blue);" :class="isMy(chat) ? 'right-info' : 'left-info'">
-                {{ formatDateTime(chat.createTime) }}
-              </span>
+						<div
+							class="user-info"
+							:class="isMy(chat) ? 'my-chat' : ''"
+						>
+							<span style="color: var(--color-red)">{{
+								chat.nickname
+							}}</span>
+							<span
+								style="color: var(--color-blue)"
+								:class="isMy(chat) ? 'right-info' : 'left-info'"
+							>
+								{{ formatDateTime(chat.createTime) }}
+							</span>
 						</div>
-						<div class="user-content" :class="isMy(chat) ? 'my-content' : ''"
-							 @contextmenu.prevent.stop="showBack(chat, index, $event)">
+						<div
+							class="user-content"
+							:class="isMy(chat) ? 'my-content' : ''"
+							@contextmenu.prevent.stop="
+								showBack(chat, index, $event)
+							"
+						>
 							<div v-html="chat.content"></div>
-							<div class="back-menu" ref="backBtn" @click="back(chat, index)">
+							<div
+								class="back-menu"
+								ref="backBtn"
+								@click="back(chat, index)"
+							>
 								撤回
 							</div>
 						</div>
@@ -30,25 +62,37 @@
 				</div>
 			</div>
 			<div class="chat-footer">
-        <textarea class="chat-input" v-model="chatContent" placeholder="开始聊天吧"
-				  @keydown="handleKeyCode($event)"></textarea>
-				<Emoji @add-emoji="handleEmoji" @choose-type="handleType"></Emoji>
-				<svg-icon class="send-btn" icon-class="plane" size="1.5rem" @click="handleSend"></svg-icon>
+				<textarea
+					class="chat-input"
+					v-model="chatContent"
+					placeholder="开始聊天吧"
+					@keydown="handleKeyCode($event)"
+				></textarea>
+				<Emoji
+					@add-emoji="handleEmoji"
+					@choose-type="handleType"
+				></Emoji>
+				<svg-icon
+					class="send-btn"
+					icon-class="plane"
+					size="1.5rem"
+					@click="handleSend"
+				></svg-icon>
 			</div>
 		</div>
 		<div class="chat-btn" @click="handleOpen">
 			<span class="unread" v-if="unreadCount > 0">{{ unreadCount }}</span>
-			<img src="https://picture.qiuyu.wiki/common/room.png" alt="">
+			<img src="https://picture.qiuyu.wiki/common/room.png" alt="" />
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import {Record} from "@/model";
-import {useBlogStore, useUserStore} from "@/store";
-import {formatDateTime} from '@/utils/date';
-import {emojiList} from "@/utils/emoji";
-import {tvList} from "@/utils/tv";
+import { Record } from "@/model";
+import { useBlogStore, useUserStore } from "@/store";
+import { formatDateTime } from "@/utils/date";
+import { emojiGenshinList } from "@/utils/emoji_genshin";
+import { emojiList } from "@/utils/emoji";
 
 const user = useUserStore();
 const blog = useBlogStore();
@@ -81,29 +125,37 @@ const {
 	emojiType,
 	unreadCount,
 	webSocketState,
-	onlineCount
+	onlineCount,
 } = toRefs(data);
 const websocketMessage = reactive<{
-	type: number,
-	data: any,
+	type: number;
+	data: any;
 }>({
 	type: 0,
-	data: {}
+	data: {},
 });
 const backBtn = ref<any>([]);
 const websocket = ref<WebSocket>();
 const timeout = ref<NodeJS.Timeout>();
 const serverTimeout = ref<NodeJS.Timeout>();
-const isMy = computed(() => (chat: Record) => chat.ipAddress == ipAddress.value || (chat.userId !== undefined && chat.userId === user.id));
-const userNickname = computed(() => user.nickname ? user.nickname : ipAddress.value);
-const userAvatar = computed(() => user.avatar ? user.avatar : blog.blogInfo.siteConfig.touristAvatar);
+const isMy = computed(
+	() => (chat: Record) =>
+		chat.ipAddress == ipAddress.value ||
+		(chat.userId !== undefined && chat.userId === user.id)
+);
+const userNickname = computed(() =>
+	user.nickname ? user.nickname : ipAddress.value
+);
+const userAvatar = computed(() =>
+	user.avatar ? user.avatar : blog.blogInfo.siteConfig.touristAvatar
+);
 const handleOpen = () => {
 	if (websocket.value === undefined) {
 		websocket.value = new WebSocket(blog.blogInfo.siteConfig.websocketUrl);
 		websocket.value.onopen = () => {
 			webSocketState.value = true;
 			startHeart();
-		}
+		};
 		websocket.value.onmessage = (event: MessageEvent) => {
 			const data = JSON.parse(event.data);
 			switch (data.type) {
@@ -134,12 +186,12 @@ const handleOpen = () => {
 					webSocketState.value = true;
 					break;
 			}
-		}
+		};
 		websocket.value.onclose = () => {
 			alert("关闭连接");
 			webSocketState.value = false;
 			clear();
-		}
+		};
 	}
 	unreadCount.value = 0;
 	show.value = !show.value;
@@ -167,12 +219,12 @@ const back = (item: Record, index: number) => {
 };
 const handleKeyCode = (e: any) => {
 	if (e.ctrlKey && e.keyCode === 13) {
-		chatContent.value = chatContent.value + '\n';
+		chatContent.value = chatContent.value + "\n";
 	} else if (e.keyCode === 13) {
 		e.preventDefault();
 		handleSend();
 	}
-}
+};
 const handleSend = () => {
 	if (chatContent.value.trim() == "") {
 		window.$message?.error("内容不能为空");
@@ -191,12 +243,12 @@ const handleSend = () => {
 			);
 		}
 		if (emojiType.value === 1) {
-			if (tvList[str] === undefined) {
+			if (emojiGenshinList[str] === undefined) {
 				return str;
 			}
 			return (
 				"<img src='" +
-				tvList[str] +
+				emojiGenshinList[str] +
 				"' width='21' height='21' style='margin: 0 1px;vertical-align: text-bottom'/>"
 			);
 		}
@@ -238,7 +290,7 @@ const waitServer = () => {
 const clear = () => {
 	timeout.value && clearTimeout(timeout.value);
 	serverTimeout.value && clearTimeout(serverTimeout.value);
-}
+};
 const handleEmoji = (key: string) => {
 	chatContent.value += key;
 };
@@ -329,7 +381,6 @@ onUpdated(() => {
 .my-chat {
 	flex-direction: row-reverse;
 }
-
 
 .chat-item {
 	display: flex;

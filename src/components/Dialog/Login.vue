@@ -237,7 +237,7 @@ const initCaptcha = debounce(() => {
 }, 500);
 const open = () => {
 	loginForm.value = {
-		username: "",
+		email: "",
 		password: "",
 		code: "",
 		captchaUUID: "",

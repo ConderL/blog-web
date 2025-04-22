@@ -1,38 +1,104 @@
 <template>
-	<n-popover trigger="click" placement="bottom-start" style="max-height: 200px;" content-style="padding: 0 8px;"
-			   :width="250" header-style="padding: 8px 15px 0 12px;font-size: 12px;" footer-style="padding: 0;"
-			   :to="false">
+	<n-popover
+		trigger="click"
+		placement="bottom-start"
+		style="max-height: 200px"
+		content-style="padding: 0 8px;"
+		:width="250"
+		header-style="padding: 8px 15px 0 12px;font-size: 12px;"
+		footer-style="padding: 0;"
+		:to="false"
+	>
 		<template #trigger>
 			<span><svg-icon icon-class="emoji"></svg-icon></span>
 		</template>
 		<template #header>
-			<div class="emoji-title">{{ emojiType === 0 ? "小黄脸" : emojiType === 1 ? "tv_小电视" : "颜文字" }}</div>
+			<div class="emoji-title">
+				{{
+					emojiType === 0
+						? "小黄脸"
+						: emojiType === 1
+						? "genshin"
+						: "颜文字"
+				}}
+			</div>
 		</template>
 		<div class="emoji-content" v-if="emojiType === 0">
-            <span class="emoji-item" v-for="(value, key, index) of emojiList" :key="index" @click="addEmoji(key)">
-                <img :src="value" :title="key" class="emoji" width="24" height="24"/>
-            </span>
+			<span
+				class="emoji-item"
+				v-for="(value, key, index) of emojiList"
+				:key="index"
+				@click="addEmoji(key)"
+			>
+				<img
+					:src="value"
+					:title="key"
+					class="emoji"
+					width="24"
+					height="24"
+				/>
+			</span>
 		</div>
 		<div class="emoji-content" v-if="emojiType === 1">
-            <span class="emoji-item" v-for="(value, key, index) of tvList" :key="index" @click="addEmoji(key)">
-                <img :src="value" :title="key" class="emoji" width="24" height="24"/>
-            </span>
+			<span
+				class="emoji-item"
+				v-for="(value, key, index) of emojiGenshinList"
+				:key="index"
+				@click="addEmoji(key)"
+			>
+				<img
+					:src="value"
+					:title="key"
+					class="emoji"
+					width="24"
+					height="24"
+				/>
+			</span>
 		</div>
 		<div class="emoji-content" v-if="emojiType === 2">
-            <span class="text-emoji" v-for="(value, index) in textList" :key="index" @click="addEmoji(value)">
-                {{ value }}
-            </span>
+			<span
+				class="text-emoji"
+				v-for="(value, index) in textList"
+				:key="index"
+				@click="addEmoji(value)"
+			>
+				{{ value }}
+			</span>
 		</div>
 		<template #footer>
 			<div class="emoji-tabs">
-				<div class="emoji-tab" :class="{ 'on': emojiType === 0 }" @click="chooseType(0)">
-					<img src="https://picture.qiuyu.wiki/emoji/re.png" width="22" height="22"/>
+				<div
+					class="emoji-tab"
+					:class="{ on: emojiType === 0 }"
+					@click="chooseType(0)"
+				>
+					<img
+						src="http://img.conder.top/emoji/tv.png"
+						width="22"
+						height="22"
+					/>
 				</div>
-				<div class="emoji-tab" :class="{ 'on': emojiType === 1 }" @click="chooseType(1)">
-					<img src="https://picture.qiuyu.wiki/emoji/tvby.png" width="22" height="22"/>
+				<div
+					class="emoji-tab"
+					:class="{ on: emojiType === 1 }"
+					@click="chooseType(1)"
+				>
+					<img
+						src="http://img.conder.top/emoji/genshin.png"
+						width="22"
+						height="22"
+					/>
 				</div>
-				<div class="emoji-tab" :class="{ 'on': emojiType === 2 }" @click="chooseType(2)">
-					<img src="https://picture.qiuyu.wiki/emoji/yan.png" width="22" height="22">
+				<div
+					class="emoji-tab"
+					:class="{ on: emojiType === 2 }"
+					@click="chooseType(2)"
+				>
+					<img
+						src="http://img.conder.top/emoji/smileys.png"
+						width="22"
+						height="22"
+					/>
 				</div>
 			</div>
 		</template>
@@ -40,9 +106,9 @@
 </template>
 
 <script setup lang="ts">
-import {emojiList} from "@/utils/emoji";
-import {textList} from "@/utils/text";
-import {tvList} from "@/utils/tv";
+import { emojiList } from "@/utils/emoji";
+import { textList } from "@/utils/text";
+import { emojiGenshinList } from "@/utils/emoji_genshin";
 
 const emojiType = ref(0);
 const emit = defineEmits(["addEmoji", "chooseType"]);
