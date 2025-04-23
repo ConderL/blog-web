@@ -98,4 +98,8 @@ export interface Record {
 	 * 创建时间
 	 */
 	createTime: string;
+	/**
+	 * 发送者id
+	 */
+	senderId: string;
 }

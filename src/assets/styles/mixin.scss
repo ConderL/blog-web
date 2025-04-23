@@ -10,11 +10,11 @@
 	left: 0;
 }
 @mixin cursor-pointer {
-	cursor: url(../icons/link.cur), default;
+	cursor: url(../icons/link.ico), default;
 }
 @mixin cursor-default {
-	cursor: url(../icons/pointer.cur), default;
+	cursor: url(../icons/pointer.ico), default;
 }
 @mixin cursor-ban {
-	cursor: url(../icons/ban.cur), default;
+	cursor: url(../icons/ban.ico), default;
 }

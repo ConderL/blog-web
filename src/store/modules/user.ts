@@ -1,6 +1,6 @@
 import { getUserInfo, logout } from "@/api/login";
 import { UserInfo } from "@/api/user/types";
-import { removeToken } from "@/utils/token";
+import { removeToken, getToken } from "@/utils/token";
 
 /**
  * 用户
@@ -54,6 +54,10 @@ interface UserState {
 	 * 说说点赞集合
 	 */
 	talkLikeSet: number[];
+	/**
+	 * 临时昵称（未登录用户）
+	 */
+	tempNickname: string;
 }
 
 export const useUserStore = defineStore("useUserStore", {
@@ -70,6 +74,7 @@ export const useUserStore = defineStore("useUserStore", {
 		articleLikeSet: [],
 		commentLikeSet: [],
 		talkLikeSet: [],
+		tempNickname: "",
 	}),
 	actions: {
 		GetUserInfo() {
@@ -145,8 +150,22 @@ export const useUserStore = defineStore("useUserStore", {
 			this.webSite = user.webSite;
 			this.intro = user.intro;
 		},
+		/**
+		 * 设置临时昵称
+		 * @param nickname 临时昵称
+		 */
+		setTempNickname(nickname: string) {
+			this.tempNickname = nickname;
+		},
 	},
-	getters: {},
+	getters: {
+		/**
+		 * 是否已登录
+		 */
+		isLogin(): boolean {
+			return !!getToken() && !!this.id;
+		},
+	},
 	persist: {
 		key: "user",
 		storage: sessionStorage,

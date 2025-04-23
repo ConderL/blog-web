@@ -12,7 +12,7 @@
 }
 
 body {
-	cursor: url("../icons/normal.cur"), default;
+	cursor: url("../icons/normal.ico"), default;
 	background: var(--grey-0);
 	color: var(--text-color);
 	font-family: Mulish, -apple-system, "PingFang SC", "Microsoft YaHei",
@@ -25,7 +25,7 @@ body {
 a,
 button,
 img {
-	cursor: url(../icons/link.cur), default !important;
+	cursor: url(../icons/link.ico), default !important;
 }
 
 h1,
@@ -50,7 +50,7 @@ textarea {
 
 input,
 textarea {
-	cursor: url(../icons/text.cur), default !important;
+	cursor: url(../icons/text.ico), default !important;
 }
 
 li {
@@ -59,12 +59,12 @@ li {
 
 .n-pagination-item--disabled {
 	color: rgba(194, 194, 194, 1);
-	cursor: url(../icons/ban.cur), default !important;
+	cursor: url(../icons/ban.ico), default !important;
 }
 
 .swiper-button-next,
 .n-pagination-item--clickable {
-	cursor: url(../icons/link.cur), default !important;
+	cursor: url(../icons/link.ico), default !important;
 }
 
 a {
@@ -75,7 +75,7 @@ a {
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 	transition: all 0.2s ease-in-out 0s;
-	cursor: url(../icons/link.cur), default !important;
+	cursor: url(../icons/link.ico), default !important;
 }
 
 .clearfix:after {

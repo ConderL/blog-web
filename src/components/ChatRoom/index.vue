@@ -5,7 +5,7 @@
 				<img
 					width="32"
 					height="32"
-					src="https://picture.qiuyu.wiki/common/chat.png"
+					src="http://img.conder.top/config/chat.png"
 				/>
 				<div style="margin-left: 12px">
 					<div>聊天室</div>
@@ -82,7 +82,7 @@
 		</div>
 		<div class="chat-btn" @click="handleOpen">
 			<span class="unread" v-if="unreadCount > 0">{{ unreadCount }}</span>
-			<img src="https://picture.qiuyu.wiki/common/room.png" alt="" />
+			<img src="http://img.conder.top/config/chat_room.svg" alt="" />
 		</div>
 	</div>
 </template>
@@ -93,9 +93,22 @@ import { useBlogStore, useUserStore } from "@/store";
 import { formatDateTime } from "@/utils/date";
 import { emojiGenshinList } from "@/utils/emoji_genshin";
 import { emojiList } from "@/utils/emoji";
+import { onMounted, ref } from "vue";
+import { loadSocketIO } from "@/plugins/socket";
 
 const user = useUserStore();
 const blog = useBlogStore();
+
+// 提前加载Socket.IO
+onMounted(async () => {
+	try {
+		await loadSocketIO();
+		console.log("Socket.IO客户端库加载成功");
+	} catch (error) {
+		console.error("Socket.IO客户端库加载失败", error);
+	}
+});
+
 const data = reactive({
 	show: false,
 	ipAddress: "",
@@ -108,14 +121,6 @@ const data = reactive({
 	onlineCount: 0,
 });
 
-enum Type {
-	ONLINE_COUNT = 1,
-	HISTORY_RECORD = 2,
-	SEND_MESSAGE = 3,
-	RECALL_MESSAGE = 4,
-	HEART_BEAT = 5,
-}
-
 const {
 	show,
 	recordList,
@@ -127,76 +132,118 @@ const {
 	webSocketState,
 	onlineCount,
 } = toRefs(data);
-const websocketMessage = reactive<{
-	type: number;
-	data: any;
-}>({
-	type: 0,
-	data: {},
-});
+
 const backBtn = ref<any>([]);
-const websocket = ref<WebSocket>();
+const websocket = ref<any>();
 const timeout = ref<NodeJS.Timeout>();
 const serverTimeout = ref<NodeJS.Timeout>();
+
 const isMy = computed(
 	() => (chat: Record) =>
 		chat.ipAddress == ipAddress.value ||
-		(chat.userId !== undefined && chat.userId === user.id)
+		(chat.userId !== undefined && chat.userId === user.id) ||
+		(chat.senderId !== undefined && chat.senderId === websocket.value.id)
 );
-const userNickname = computed(() =>
-	user.nickname ? user.nickname : ipAddress.value
-);
+const userNickname = computed(() => {
+	// 如果是登录用户，使用登录昵称
+	if (user.isLogin && user.nickname) {
+		return user.nickname;
+	}
+	// 未登录用户，优先使用随机昵称
+	if (user.tempNickname) {
+		return user.tempNickname;
+	}
+	// 如果都没有，使用IP地址
+	return ipAddress.value || "访客";
+});
 const userAvatar = computed(() =>
 	user.avatar ? user.avatar : blog.blogInfo.siteConfig.touristAvatar
 );
 const handleOpen = () => {
 	if (websocket.value === undefined) {
-		websocket.value = new WebSocket(blog.blogInfo.siteConfig.websocketUrl);
-		websocket.value.onopen = () => {
+		const io = (window as any).io;
+		if (!io) {
+			console.error("Socket.IO客户端库未加载，请确保已正确引入");
+			return;
+		}
+
+		const socket = io(blog.blogInfo.siteConfig.websocketUrl, {
+			transports: ["websocket", "polling"],
+			reconnection: true,
+			reconnectionAttempts: 5,
+		});
+
+		websocket.value = socket;
+
+		socket.on("connect", () => {
 			webSocketState.value = true;
 			startHeart();
-		};
-		websocket.value.onmessage = (event: MessageEvent) => {
-			const data = JSON.parse(event.data);
-			switch (data.type) {
-				case Type.ONLINE_COUNT:
-					// 在线人数
-					onlineCount.value = data.data;
-					break;
-				case Type.HISTORY_RECORD:
-					recordList.value = data.data.chatRecordList;
-					ipAddress.value = data.data.ipAddress;
-					ipSource.value = data.data.ipSource;
-					break;
-				case Type.SEND_MESSAGE:
-					recordList.value.push(data.data);
-					if (!show.value) {
-						unreadCount.value++;
-					}
-					break;
-				case Type.RECALL_MESSAGE:
-					for (let i = 0; i < recordList.value.length; i++) {
-						if (recordList.value[i].id === data.data) {
-							recordList.value.splice(i, 1);
-							i--;
-						}
-					}
-					break;
-				case Type.HEART_BEAT:
-					webSocketState.value = true;
-					break;
+		});
+
+		socket.on("chat-message", (data: any) => {
+			console.log("收到消息:", data);
+			recordList.value.push(data);
+			if (!show.value) {
+				unreadCount.value++;
 			}
-		};
-		websocket.value.onclose = () => {
+		});
+
+		socket.on("online", (data: any) => {
+			console.log("在线人数:", data);
+			onlineCount.value = data.count;
+		});
+
+		socket.on("history", (messages: any) => {
+			console.log("收到历史消息:", messages);
+			recordList.value = messages;
+		});
+
+		socket.on("init", (data: any) => {
+			console.log("收到初始化数据:", data);
+			// 设置IP和昵称
+			ipAddress.value = data.ip;
+			ipSource.value = data.ipSource || "";
+
+			// 如果用户没有登录，使用随机昵称
+			if (!user.isLogin) {
+				user.setTempNickname(data.nickname);
+			}
+		});
+
+		socket.on("recall", (messageId: number) => {
+			console.log("收到撤回消息:", messageId);
+			for (let i = 0; i < recordList.value.length; i++) {
+				if (recordList.value[i].id === messageId) {
+					recordList.value.splice(i, 1);
+					break;
+				}
+			}
+		});
+
+		socket.on("error", (error: any) => {
+			console.error("Socket错误:", error);
+			window.$message?.error(error.message || "发生错误");
+		});
+
+		socket.on("disconnect", () => {
 			alert("关闭连接");
 			webSocketState.value = false;
 			clear();
-		};
+		});
+
+		socket.on("heartbeat", () => {
+			console.log("收到心跳响应");
+			webSocketState.value = true;
+		});
+
+		socket.on("warning", (data: any) => {
+			console.warn("敏感词警告:", data);
+			window.$message?.warning(data.message);
+		});
 	}
 	unreadCount.value = 0;
 	show.value = !show.value;
 };
-// 展示菜单
 const showBack = (chat: Record, index: number, e: any) => {
 	backBtn.value.forEach((item: any) => {
 		item.style.display = "none";
@@ -210,11 +257,10 @@ const showBack = (chat: Record, index: number, e: any) => {
 		backBtn.value[index].style.display = "block";
 	}
 };
-// 撤回消息
 const back = (item: Record, index: number) => {
-	websocketMessage.type = Type.RECALL_MESSAGE;
-	websocketMessage.data = item.id;
-	websocket.value?.send(JSON.stringify(websocketMessage));
+	if (websocket.value) {
+		websocket.value.emit("recall", item.id);
+	}
 	backBtn.value[index].style.display = "none";
 };
 const handleKeyCode = (e: any) => {
@@ -230,7 +276,6 @@ const handleSend = () => {
 		window.$message?.error("内容不能为空");
 		return;
 	}
-	// 解析表情
 	chatContent.value = chatContent.value.replace(/\[.+?\]/g, (str) => {
 		if (emojiType.value === 0) {
 			if (emojiList[str] === undefined) {
@@ -262,18 +307,19 @@ const handleSend = () => {
 		ipAddress: ipAddress.value,
 		ipSource: ipSource.value,
 	};
-	websocketMessage.type = Type.SEND_MESSAGE;
-	websocketMessage.data = chat;
-	websocket.value?.send(JSON.stringify(websocketMessage));
+
+	if (websocket.value) {
+		websocket.value.emit("chat-message", chat);
+	}
+
 	chatContent.value = "";
 };
 const startHeart = () => {
 	timeout.value = setTimeout(() => {
-		const beatMessage = {
-			type: Type.HEART_BEAT,
-			data: "ping",
-		};
-		websocket.value?.send(JSON.stringify(beatMessage));
+		if (websocket.value) {
+			// 向服务器发送心跳事件
+			websocket.value.emit("heartbeat", { timestamp: Date.now() });
+		}
 		waitServer();
 	}, 30 * 1000);
 };

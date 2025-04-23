@@ -12,12 +12,17 @@
 		<!-- 波浪 -->
 		<Waves></Waves>
 		<!-- 向下按钮 -->
-		<svg-icon class="arrow-down" icon-class="down" size="32px" @click="scrollDown"></svg-icon>
+		<svg-icon
+			class="arrow-down"
+			icon-class="down"
+			size="32px"
+			@click="scrollDown"
+		></svg-icon>
 	</div>
 </template>
 
 <script setup lang="ts">
-import {useBlogStore} from "@/store";
+import { useBlogStore } from "@/store";
 import EasyTyper from "easy-typer-js";
 
 const blog = useBlogStore();
@@ -45,14 +50,12 @@ const fetchData = () => {
 		.then((res) => {
 			return res.json();
 		})
-		.then(({hitokoto}) => {
+		.then(({ hitokoto }) => {
 			new EasyTyper(
 				obj,
 				hitokoto,
-				() => {
-				},
-				() => {
-				}
+				() => {},
+				() => {}
 			);
 		});
 };
@@ -81,8 +84,8 @@ onMounted(() => {
 	z-index: -1;
 
 	.artboard {
-		font-family: "Fredericka the Great", Mulish, -apple-system, "PingFang SC", "Microsoft YaHei",
-		sans-serif;
+		font-family: "Fredericka the Great", Mulish, -apple-system,
+			"PingFang SC", "Microsoft YaHei", sans-serif;
 		font-size: 3.5em;
 		line-height: 1.2;
 		animation: titleScale 1s;
@@ -102,11 +105,11 @@ onMounted(() => {
 }
 
 .arrow-down {
+	@include cursor-pointer;
 	position: absolute;
 	bottom: 70px;
 	-webkit-animation: arrow-shake 1.5s ease-out infinite;
 	animation: arrow-shake 1.5s ease-out infinite;
-	cursor: pointer;
 	z-index: 8;
 }
 
