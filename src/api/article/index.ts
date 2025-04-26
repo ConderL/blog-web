@@ -52,7 +52,7 @@ export function searchArticle(
 	keyword: string
 ): AxiosPromise<Result<ArticleSearch[]>> {
 	return request({
-		url: "/article/search",
+		url: "/articles/search",
 		method: "get",
 		params: {
 			keyword,
