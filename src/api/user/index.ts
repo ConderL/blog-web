@@ -8,11 +8,11 @@ import { EmailForm, UserInfo } from "./types";
  * @param data 用户密码
  */
 export function updateUserPassword(data: UserForm): AxiosPromise<Result<null>> {
-  return request({
-    url: "/user/password",
-    method: "put",
-    data,
-  });
+	return request({
+		url: "/auth/user/password",
+		method: "put",
+		data,
+	});
 }
 
 /**
@@ -20,12 +20,12 @@ export function updateUserPassword(data: UserForm): AxiosPromise<Result<null>> {
  * @param data 头像
  */
 export function updateUserAvatar(data: FormData): AxiosPromise<Result<string>> {
-  return request({
-    url: "/user/avatar",
-    method: "post",
-    headers: { "content-type": "multipart/form-data" },
-    data,
-  });
+	return request({
+		url: "/user/avatar",
+		method: "post",
+		headers: { "content-type": "multipart/form-data" },
+		data,
+	});
 }
 
 /**
@@ -33,11 +33,11 @@ export function updateUserAvatar(data: FormData): AxiosPromise<Result<string>> {
  * @param data 用户邮箱
  */
 export function updateUserEmail(data: EmailForm): AxiosPromise<Result<null>> {
-  return request({
-    url: "/user/email",
-    method: "put",
-    data,
-  });
+	return request({
+		url: "/user/email",
+		method: "put",
+		data,
+	});
 }
 
 /**
@@ -45,11 +45,11 @@ export function updateUserEmail(data: EmailForm): AxiosPromise<Result<null>> {
  * @param data 用户信息
  */
 export function updateUserInfo(data: UserInfo): AxiosPromise<Result<null>> {
-  return request({
-    url: "/user/info",
-    method: "put",
-    data,
-  });
+	return request({
+		url: "/user/info",
+		method: "put",
+		data,
+	});
 }
 
 /**
@@ -57,10 +57,10 @@ export function updateUserInfo(data: UserInfo): AxiosPromise<Result<null>> {
  * @param data 头像
  */
 export function biliUpload(data: FormData): AxiosPromise<Result<string>> {
-  return request({
-    url: "/bili/upload",
-    method: "post",
-    headers: { "content-type": "multipart/form-data" },
-    data,
-  });
+	return request({
+		url: "/bili/upload",
+		method: "post",
+		headers: { "content-type": "multipart/form-data" },
+		data,
+	});
 }

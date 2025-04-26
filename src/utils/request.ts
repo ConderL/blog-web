@@ -36,38 +36,34 @@ requests.interceptors.request.use(
 	}
 );
 
+const handleResponse = (response: AxiosResponse) => {
+	switch (response.data.code) {
+		case -1:
+			window.$message?.error(response.data.msg);
+			break;
+		case 400:
+			window.$message?.error(response.data.msg);
+			break;
+		case 402:
+			const user = useUserStore();
+			user.forceLogOut();
+			window.$message?.error(response.data.msg);
+			break;
+		case 500:
+			window.$message?.error(response.data.msg);
+			break;
+	}
+};
+
 // 配置响应拦截器
 requests.interceptors.response.use(
 	(response: AxiosResponse) => {
-		switch (response.data.code) {
-			case -1:
-				window.$message?.error(response.data.msg);
-				break;
-			case 400:
-				window.$message?.error(response.data.msg);
-				break;
-			case 402:
-				const user = useUserStore();
-				user.forceLogOut();
-				window.$message?.error(response.data.msg);
-				break;
-			case 500:
-				window.$message?.error(response.data.msg);
-				break;
-		}
+		handleResponse(response);
 		return response;
 	},
 	(error: AxiosError) => {
-		let { message } = error;
-		if (message == "Network Error") {
-			message = "后端接口连接异常";
-		} else if (message.includes("timeout")) {
-			message = "系统接口请求超时";
-		} else if (message.includes("Request failed with status code")) {
-			message =
-				"系统接口" + message.substring(message.length - 3) + "异常";
-		}
-		window.$message?.error(message, { duration: 5000 });
+		let { response } = error;
+		handleResponse(response as AxiosResponse);
 		return Promise.reject(error);
 	}
 );

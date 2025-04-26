@@ -99,6 +99,10 @@ export interface Record {
 	 */
 	createTime: string;
 	/**
+	 * 服务器返回的时间（替代字段）
+	 */
+	time?: Date;
+	/**
 	 * 发送者id
 	 */
 	senderId: string;

@@ -39,7 +39,7 @@
 								style="color: var(--color-blue)"
 								:class="isMy(chat) ? 'right-info' : 'left-info'"
 							>
-								{{ formatDateTime(chat.createTime) }}
+								{{ formatMessageTime(chat) }}
 							</span>
 						</div>
 						<div
@@ -96,6 +96,9 @@ import { emojiList } from "@/utils/emoji";
 import { onMounted, ref } from "vue";
 import { loadSocketIO } from "@/plugins/socket";
 
+// 导入基本类型
+import type { Record as ChatRecord } from "@/model";
+
 const user = useUserStore();
 const blog = useBlogStore();
 
@@ -113,7 +116,7 @@ const data = reactive({
 	show: false,
 	ipAddress: "",
 	ipSource: "",
-	recordList: [] as Record[],
+	recordList: [] as ChatRecord[],
 	chatContent: "",
 	emojiType: 0,
 	unreadCount: 0,
@@ -139,7 +142,7 @@ const timeout = ref<NodeJS.Timeout>();
 const serverTimeout = ref<NodeJS.Timeout>();
 
 const isMy = computed(
-	() => (chat: Record) =>
+	() => (chat: ChatRecord) =>
 		chat.ipAddress == ipAddress.value ||
 		(chat.userId !== undefined && chat.userId === user.id) ||
 		(chat.senderId !== undefined && chat.senderId === websocket.value.id)
@@ -167,11 +170,27 @@ const handleOpen = () => {
 			return;
 		}
 
-		const socket = io(blog.blogInfo.siteConfig.websocketUrl, {
+		// 构建连接选项，添加查询参数传递用户信息
+		const connectionOptions = {
 			transports: ["websocket", "polling"],
 			reconnection: true,
 			reconnectionAttempts: 5,
-		});
+			query: {} as { [key: string]: any },
+		};
+
+		// 如果用户已登录，添加用户ID和昵称到查询参数
+		if (user.isLogin) {
+			connectionOptions.query.userId = user.id;
+			connectionOptions.query.nickname = user.nickname;
+			connectionOptions.query.avatar =
+				user.avatar || blog.blogInfo.siteConfig.touristAvatar;
+			console.log("用户已登录，传递用户信息:", user.nickname, user.id);
+		}
+
+		const socket = io(
+			blog.blogInfo.siteConfig.websocketUrl,
+			connectionOptions
+		);
 
 		websocket.value = socket;
 
@@ -226,14 +245,8 @@ const handleOpen = () => {
 		});
 
 		socket.on("disconnect", () => {
-			alert("关闭连接");
 			webSocketState.value = false;
 			clear();
-		});
-
-		socket.on("heartbeat", () => {
-			console.log("收到心跳响应");
-			webSocketState.value = true;
 		});
 
 		socket.on("warning", (data: any) => {
@@ -244,7 +257,7 @@ const handleOpen = () => {
 	unreadCount.value = 0;
 	show.value = !show.value;
 };
-const showBack = (chat: Record, index: number, e: any) => {
+const showBack = (chat: ChatRecord, index: number, e: any) => {
 	backBtn.value.forEach((item: any) => {
 		item.style.display = "none";
 	});
@@ -257,7 +270,7 @@ const showBack = (chat: Record, index: number, e: any) => {
 		backBtn.value[index].style.display = "block";
 	}
 };
-const back = (item: Record, index: number) => {
+const back = (item: ChatRecord, index: number) => {
 	if (websocket.value) {
 		websocket.value.emit("recall", item.id);
 	}
@@ -315,33 +328,92 @@ const handleSend = () => {
 	chatContent.value = "";
 };
 const startHeart = () => {
+	// 清除之前可能存在的定时器
+	clear();
+
+	// 设置定时发送心跳的任务
 	timeout.value = setTimeout(() => {
-		if (websocket.value) {
+		if (websocket.value && websocket.value.connected) {
+			console.log("发送心跳...");
 			// 向服务器发送心跳事件
 			websocket.value.emit("heartbeat", { timestamp: Date.now() });
+			// 设置等待响应的定时器
+			waitServer();
+		} else {
+			console.log("WebSocket未连接，尝试重连...");
+			// 如果已断开，尝试重连
+			websocket.value?.connect();
 		}
-		waitServer();
-	}, 30 * 1000);
+	}, 60 * 1000); // 改为1分钟发送一次心跳
 };
 const waitServer = () => {
-	webSocketState.value = false;
+	// 清除可能存在的等待响应定时器
+	if (serverTimeout.value) {
+		clearTimeout(serverTimeout.value);
+	}
+
+	// 设置心跳超时的状态标记
+	let heartbeatReceived = false;
+
+	// 在接收到心跳响应时修改标记
+	const heartbeatListener = () => {
+		console.log("收到心跳响应");
+		heartbeatReceived = true;
+		webSocketState.value = true;
+	};
+
+	// 添加一次性心跳响应监听器
+	websocket.value.once("heartbeat", heartbeatListener);
+
+	// 设置心跳响应超时检查
 	serverTimeout.value = setTimeout(() => {
-		if (webSocketState.value) {
-			startHeart();
-			return;
+		// 移除一次性监听器
+		websocket.value?.off("heartbeat", heartbeatListener);
+
+		if (!heartbeatReceived) {
+			console.warn("心跳响应超时，尝试重连");
+			webSocketState.value = false;
+
+			// 尝试重新连接
+			if (websocket.value) {
+				try {
+					websocket.value.disconnect();
+					setTimeout(() => {
+						websocket.value?.connect();
+					}, 1000);
+				} catch (error) {
+					console.error("重连失败:", error);
+				}
+			}
 		}
-		websocket.value?.close();
-	}, 20 * 1000);
+
+		// 继续发送下一个心跳
+		startHeart();
+	}, 10 * 1000); // 10秒超时时间
 };
 const clear = () => {
-	timeout.value && clearTimeout(timeout.value);
-	serverTimeout.value && clearTimeout(serverTimeout.value);
+	if (timeout.value) {
+		clearTimeout(timeout.value);
+		timeout.value = undefined;
+	}
+	if (serverTimeout.value) {
+		clearTimeout(serverTimeout.value);
+		serverTimeout.value = undefined;
+	}
 };
 const handleEmoji = (key: string) => {
 	chatContent.value += key;
 };
 const handleType = (key: number) => {
 	emojiType.value = key;
+};
+const formatMessageTime = (chat: ChatRecord) => {
+	if (!chat) return "";
+
+	// 优先使用createTime，如果没有则使用time
+	const timeValue =
+		chat.createTime || (chat.time ? new Date(chat.time).toISOString() : "");
+	return formatDateTime(timeValue || new Date());
 };
 onUpdated(() => {
 	const element = document.getElementById("chat-content");

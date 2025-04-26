@@ -81,6 +81,7 @@ export const useUserStore = defineStore("useUserStore", {
 			return new Promise((resolve, reject) => {
 				getUserInfo()
 					.then(({ data }) => {
+						console.log(data, "data.flag");
 						if (data.flag) {
 							this.id = data.data.id;
 							this.avatar = data.data.avatar;

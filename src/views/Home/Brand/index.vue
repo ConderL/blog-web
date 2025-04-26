@@ -29,11 +29,11 @@ const blog = useBlogStore();
 const obj = reactive({
 	output: "",
 	isEnd: false,
-	speed: 100,
+	speed: 80,
 	singleBack: false,
-	sleep: 0,
-	type: "normal",
-	backSpeed: 100,
+	sleep: 5000,
+	type: "rollback",
+	backSpeed: 10,
 	sentencePause: false,
 });
 const brandRef = ref<HTMLElement>();
@@ -50,15 +50,11 @@ const fetchData = () => {
 		.then((res) => {
 			return res.json();
 		})
-		.then(({ hitokoto }) => {
-			new EasyTyper(
-				obj,
-				hitokoto,
-				() => {},
-				() => {}
-			);
+		.then(({ hitokoto, from }) => {
+			new EasyTyper(obj, `${hitokoto} —— ${from}`, fetchData, () => {});
 		});
 };
+
 onMounted(() => {
 	fetchData();
 });

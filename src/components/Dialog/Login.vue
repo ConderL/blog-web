@@ -191,22 +191,26 @@ const handleLogin = () => {
 		loginForm.value.password = password;
 	}
 	loading.value = true;
-	login(loginForm.value).then(({ data }) => {
-		if (data.flag) {
-			setToken(data.data.token);
-			user.GetUserInfo();
-			window.$message?.success("登录成功");
-			loginForm.value = {
-				email: "",
-				password: "",
-				code: "",
-				captchaUUID: "",
-				type: "",
-			};
-			app.setLoginFlag(false);
-		}
-		loading.value = false;
-	});
+	login(loginForm.value)
+		.then(({ data }) => {
+			if (data.flag) {
+				setToken(data.data.token);
+				user.GetUserInfo();
+				window.$message?.success("登录成功");
+				loginForm.value = {
+					email: "",
+					password: "",
+					code: "",
+					captchaUUID: "",
+					type: "",
+				};
+				app.setLoginFlag(false);
+			}
+			loading.value = false;
+		})
+		.catch(() => {
+			loading.value = false;
+		});
 };
 const initCaptcha = debounce(() => {
 	captchaLoading.value = true;
