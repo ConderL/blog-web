@@ -1,35 +1,61 @@
 <template>
 	<div class="page-header">
 		<h1 class="page-title">分类</h1>
-		<img class="page-cover" :src="blog.blogInfo.siteConfig.categoryWallpaper"
-			 alt="">
+		<img
+			class="page-cover"
+			:src="blog.blogInfo.siteConfig.categoryWallpaper"
+			alt=""
+		/>
 		<Waves></Waves>
 	</div>
 	<div class="bg">
 		<div class="page-container">
 			<n-grid x-gap="15" y-gap="15" cols="1 s:2 m:3" responsive="screen">
-				<n-grid-item class="article-item" v-for="article of articleList" :key="article.id">
+				<n-grid-item
+					class="article-item"
+					v-for="article of articleList"
+					:key="article.id"
+				>
 					<div class="article-cover">
-						<router-link :to="`/article/${article.id}`"><img class="cover" v-lazy="article.articleCover">
+						<router-link :to="`/article/${article.id}`"
+							><img class="cover" v-lazy="article.articleCover" />
 						</router-link>
 					</div>
 					<div class="article-info">
 						<div class="article-title">
-							<router-link :to="`/article/${article.id}`">{{ article.articleTitle }}</router-link>
+							<router-link :to="`/article/${article.id}`">{{
+								article.articleTitle
+							}}</router-link>
 						</div>
 						<div class="article-meta">
-              <span><svg-icon icon-class="calendar" size="0.95rem"></svg-icon>
-                {{ formatDate(article.createTime) }}</span>
-							<router-link :to="`/category/${article.category.id}`">
-								<svg-icon icon-class="qizhi"
-										  size="0.9rem"></svg-icon>
+							<span
+								><svg-icon
+									icon-class="calendar"
+									size="0.95rem"
+								></svg-icon>
+								{{ formatDate(article.createTime) }}</span
+							>
+							<router-link
+								:to="`/category/${article.category.id}`"
+							>
+								<svg-icon
+									icon-class="qizhi"
+									size="0.9rem"
+								></svg-icon>
 								{{ article.category.categoryName }}
 							</router-link>
 						</div>
 						<div class="tag-info">
-							<router-link :to="`/tag/${tag.id}`" class="article-tag" v-for="tag in article.tagVOList"
-										 :key="tag.id">
-								<svg-icon icon-class="tag" size="0.8rem"></svg-icon>
+							<router-link
+								:to="`/tag/${tag.id}`"
+								class="article-tag"
+								v-for="tag in article.tagVOList"
+								:key="tag.id"
+							>
+								<svg-icon
+									icon-class="tag"
+									size="0.8rem"
+								></svg-icon>
 								{{ tag.tagName }}
 							</router-link>
 						</div>
@@ -41,12 +67,12 @@
 </template>
 
 <script setup lang="ts">
-import {ArticleCondition, ArticleQuery} from '@/api/article/types';
-import {getCategoryArticleList} from '@/api/category';
-import {formatDate} from '@/utils/date';
-import {useBlogStore} from "@/store";
+import { ArticleCondition, ArticleQuery } from "@/api/article/types";
+import { getCategoryArticleList } from "@/api/category";
+import { formatDate } from "@/utils/date";
+import { useBlogStore } from "@/store";
 
-const {blog} = useBlogStore();
+const blog = useBlogStore();
 const route = useRoute();
 const data = reactive({
 	queryParams: {
@@ -57,12 +83,12 @@ const data = reactive({
 	name: "",
 	articleList: [] as ArticleCondition[],
 });
-const {queryParams, name, articleList} = toRefs(data);
+const { queryParams, name, articleList } = toRefs(data);
 onMounted(() => {
-	getCategoryArticleList(queryParams.value).then(({data}) => {
+	getCategoryArticleList(queryParams.value).then(({ data }) => {
 		articleList.value = data.data.articleConditionVOList;
 		name.value = data.data.name;
-	})
+	});
 });
 </script>
 
@@ -90,7 +116,7 @@ onMounted(() => {
 	object-fit: cover;
 	width: 100%;
 	height: 100%;
-	transition: all .5s;
+	transition: all 0.5s;
 }
 
 .article-item:hover .cover {

@@ -1,16 +1,27 @@
 <template>
 	<div class="page-header">
 		<h1 class="page-title">相册</h1>
-		<img class="page-cover" :src="blog.blogInfo.siteConfig.albumWallpaper" alt="">
+		<img
+			class="page-cover"
+			:src="blog.blogInfo.siteConfig.albumWallpaper"
+			alt=""
+		/>
 		<!-- 波浪 -->
 		<Waves></Waves>
 	</div>
 	<div class="bg">
 		<div class="page-container">
 			<div class="album-container">
-				<div class="album-item" v-for="album in albumList" :key="album.id">
-					<img class="album-cover" v-lazy="album.albumCover">
-					<router-link :to="`/album/${album.id}`" class="album-info">
+				<div
+					class="album-item"
+					v-for="album in albumList"
+					:key="album.id"
+				>
+					<img class="album-cover" v-lazy="album.albumCover" />
+					<router-link
+						:to="`/album/${album.id}?wallpaper=${album.albumCover}`"
+						class="album-info"
+					>
 						<div class="album-name">{{ album.albumName }}</div>
 						<div class="album-desc">{{ album.albumDesc }}</div>
 					</router-link>
@@ -21,17 +32,17 @@
 </template>
 
 <script setup lang="ts">
-import {getAlbumList} from "@/api/album";
-import {Album} from "@/api/album/types";
-import {useBlogStore} from "@/store";
+import { getAlbumList } from "@/api/album";
+import { Album } from "@/api/album/types";
+import { useBlogStore } from "@/store";
 
 const blog = useBlogStore();
 const albumList = ref<Album[]>([]);
 onMounted(() => {
-	getAlbumList().then(({data}) => {
+	getAlbumList().then(({ data }) => {
 		albumList.value = data.data;
-	})
-})
+	});
+});
 </script>
 
 <style lang="scss" scoped>
@@ -75,11 +86,11 @@ onMounted(() => {
 	position: relative;
 	font-weight: 700;
 	font-size: 1.25rem;
-	padding: .7rem 0;
+	padding: 0.7rem 0;
 	overflow: hidden;
 
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		bottom: 0;
 		left: 0;
