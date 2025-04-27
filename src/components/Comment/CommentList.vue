@@ -57,7 +57,7 @@
 						>
 					</div>
 					<div
-						class="sub-reply-item"
+					 	class="sub-reply-item"
 						v-for="reply of comment.replyVOList"
 						:key="reply.id"
 					>

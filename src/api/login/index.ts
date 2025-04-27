@@ -106,7 +106,7 @@ export function logout(): AxiosPromise<Result<null>> {
  */
 export function giteeLogin(data: GitInfo): AxiosPromise<Result<string>> {
 	return request({
-		url: "/oauth/gitee",
+		url: "/oauth/login/gitee",
 		method: "post",
 		data,
 	});
@@ -119,7 +119,7 @@ export function giteeLogin(data: GitInfo): AxiosPromise<Result<string>> {
  */
 export function githubLogin(data: GitInfo): AxiosPromise<Result<string>> {
 	return request({
-		url: "/oauth/github",
+		url: "/oauth/login/github",
 		method: "post",
 		data,
 	});
@@ -132,7 +132,7 @@ export function githubLogin(data: GitInfo): AxiosPromise<Result<string>> {
  */
 export function qqLogin(data: GitInfo): AxiosPromise<Result<string>> {
 	return request({
-		url: "/oauth/qq",
+		url: "/oauth/login/qq",
 		method: "post",
 		data,
 	});

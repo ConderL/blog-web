@@ -93,7 +93,7 @@ export interface UserInfo {
  */
 export interface GitInfo {
 	/**
-	 * 第三方code
+	 * 第三方token
 	 */
-	code: string;
+	token: string;
 }
