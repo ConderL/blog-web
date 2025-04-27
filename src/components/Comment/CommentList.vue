@@ -149,15 +149,23 @@
 </template>
 
 <script setup lang="ts">
-import { getCommentList, getReplyList, likeComment } from "@/api/comment";
+import {
+	getCommentList,
+	getReplyList,
+	likeComment,
+	unlikeComment,
+} from "@/api/comment";
 import { Comment, CommentQuery, Reply } from "@/api/comment/types";
 import { useAppStore, useUserStore } from "@/store";
 import { formatDateTime } from "@/utils/date";
+import { ClickDebouncer } from "@/utils/debounce";
 const user = useUserStore();
 const app = useAppStore();
 const replyRef = ref<any>([]);
 const pageRef = ref<any>([]);
 const readMoreRef = ref<any>([]);
+// 创建点赞防抖器实例，设置800ms防抖时间
+const likeDebouncer = new ClickDebouncer(800);
 const props = defineProps({
 	commentType: {
 		type: Number,
@@ -167,10 +175,9 @@ const emit = defineEmits(["getCommentCount"]);
 const typeId = computed(() =>
 	Number(useRoute().params.id) ? Number(useRoute().params.id) : undefined
 );
-const isLike = computed(
-	() => (id: number) =>
-		user.commentLikeSet.indexOf(id) != -1 ? "like-flag" : ""
-);
+const isLike = computed(() => (id: number) => {
+	return user.commentLikeSet.indexOf(id) != -1 ? "like-flag" : "";
+});
 const data = reactive({
 	count: 0,
 	reFresh: true,
@@ -187,18 +194,48 @@ const like = (comment: Comment | Reply) => {
 		app.setLoginFlag(true);
 		return;
 	}
+
 	let id = comment.id;
-	likeComment(id).then(({ data }) => {
-		if (data.flag) {
-			//判断是否点赞
-			if (user.commentLikeSet.indexOf(id) != -1) {
-				comment.likeCount -= 1;
-			} else {
-				comment.likeCount += 1;
-			}
-			user.commentLike(id);
-		}
-	});
+
+	// 使用防抖器检查是否可以点赞，防止快速多次点击
+	if (!likeDebouncer.canClick(id)) {
+		return;
+	}
+
+	console.log("当前评论:", comment);
+	console.log(
+		"当前点赞状态:",
+		user.commentLikeSet.indexOf(id) != -1 ? "已点赞" : "未点赞"
+	);
+
+	// 判断当前是否已点赞
+	if (user.commentLikeSet.indexOf(id) != -1) {
+		// 已点赞，调用取消点赞API
+		unlikeComment(id)
+			.then(({ data }) => {
+				console.log("取消点赞响应:", data);
+				if (data.flag) {
+					comment.likeCount = Math.max(0, comment.likeCount - 1);
+					user.commentLike(id);
+				}
+			})
+			.catch((error) => {
+				console.error("取消点赞失败:", error);
+			});
+	} else {
+		// 未点赞，调用点赞API
+		likeComment(id)
+			.then(({ data }) => {
+				console.log("点赞响应:", data);
+				if (data.flag) {
+					comment.likeCount += 1;
+					user.commentLike(id);
+				}
+			})
+			.catch((error) => {
+				console.error("点赞失败:", error);
+			});
+	}
 };
 // 刷新评论列表
 watch(

@@ -129,7 +129,7 @@ const handleAdd = () => {
 				return (
 					"<img src= '" +
 					emojiGenshinList[str] +
-					"' width='21' height='21' style='margin: 0 1px;vertical-align: text-bottom'/>"
+					"' width='60' height='60' style='margin: 0 1px;vertical-align: text-bottom'/>"
 				);
 			}
 			return str;

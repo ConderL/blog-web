@@ -14,6 +14,9 @@ import MarkExtension from "markdown-it-mark";
 import Anchor from "markdown-it-anchor";
 import LinkAttr from "markdown-it-link-attributes";
 
+// 导入认证调试工具（仅在开发环境使用）
+import { initAuthDebug } from "./utils/auth-debug";
+
 async function setupApp() {
 	setupAssets();
 
@@ -30,6 +33,14 @@ async function setupApp() {
 	setupViewer(app);
 
 	await setupRouter(app);
+
+	// 在开发环境下加载认证调试工具
+	if (import.meta.env.DEV) {
+		initAuthDebug();
+		console.log(
+			"开发模式：认证调试工具已激活，可在控制台使用authDebug对象"
+		);
+	}
 
 	app.mount("#app");
 

@@ -187,6 +187,11 @@ const handleOpen = () => {
 			console.log("用户已登录，传递用户信息:", user.nickname, user.id);
 		}
 
+		console.log(
+			blog.blogInfo.siteConfig.websocketUrl,
+			"blog.blogInfo.siteConfig.websocketUrl"
+		);
+
 		const socket = io(
 			blog.blogInfo.siteConfig.websocketUrl,
 			connectionOptions
@@ -195,8 +200,17 @@ const handleOpen = () => {
 		websocket.value = socket;
 
 		socket.on("connect", () => {
+			console.log("WebSocket已连接!", socket.id);
 			webSocketState.value = true;
 			startHeart();
+		});
+
+		socket.on("connect_error", (error: Error) => {
+			console.error("WebSocket连接错误:", error);
+			console.log(
+				"尝试连接的URL:",
+				blog.blogInfo.siteConfig.websocketUrl
+			);
 		});
 
 		socket.on("chat-message", (data: any) => {
@@ -307,7 +321,7 @@ const handleSend = () => {
 			return (
 				"<img src='" +
 				emojiGenshinList[str] +
-				"' width='21' height='21' style='margin: 0 1px;vertical-align: text-bottom'/>"
+				"' width='60' height='60' style='margin: 0 1px;vertical-align: text-bottom'/>"
 			);
 		}
 		return str;
