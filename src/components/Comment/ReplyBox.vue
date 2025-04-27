@@ -44,6 +44,7 @@ import { CommentForm } from "@/api/comment/types";
 import { useAppStore, useBlogStore, useUserStore } from "@/store";
 import { emojiGenshinList } from "@/utils/emoji_genshin";
 import { emojiList } from "@/utils/emoji";
+import { processEmoji } from "@/utils/emoji-processor";
 const user = useUserStore();
 const blog = useBlogStore();
 const app = useAppStore();
@@ -108,33 +109,14 @@ const handleAdd = () => {
 		window.$message?.error("评论不能为空");
 		return;
 	}
-	// 解析表情
-	commentForm.value.commentContent = commentContent.value.replace(
-		/\[.+?\]/g,
-		(str) => {
-			if (emojiType.value === 0) {
-				if (emojiList[str] === undefined) {
-					return str;
-				}
-				return (
-					"<img src= '" +
-					emojiList[str] +
-					"' width='21' height='21' style='margin: 0 1px;vertical-align: text-bottom'/>"
-				);
-			}
-			if (emojiType.value === 1) {
-				if (emojiGenshinList[str] === undefined) {
-					return str;
-				}
-				return (
-					"<img src= '" +
-					emojiGenshinList[str] +
-					"' width='60' height='60' style='margin: 0 1px;vertical-align: text-bottom'/>"
-				);
-			}
-			return str;
-		}
+
+	// 使用工具函数处理表情
+	commentForm.value.commentContent = processEmoji(
+		commentContent.value,
+		emojiType.value
 	);
+
+	// 发送评论
 	addComment(commentForm.value).then(({ data }) => {
 		if (data.flag) {
 			sendActive.value = false;

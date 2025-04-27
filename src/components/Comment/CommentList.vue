@@ -32,7 +32,7 @@
 					</div>
 					<div
 						class="reply-content"
-						v-html="comment.commentContent"
+						v-html="processContent(comment.commentContent)"
 					></div>
 					<div class="reply-info">
 						<span class="reply-time">{{
@@ -80,7 +80,9 @@
 								>
 								:</template
 							>
-							<span v-html="reply.commentContent"></span>
+							<span
+								v-html="processContent(reply.commentContent)"
+							></span>
 						</span>
 						<div class="reply-info">
 							<span class="reply-time">{{
@@ -159,6 +161,7 @@ import { Comment, CommentQuery, Reply } from "@/api/comment/types";
 import { useAppStore, useUserStore } from "@/store";
 import { formatDateTime } from "@/utils/date";
 import { ClickDebouncer } from "@/utils/debounce";
+import { cleanupContent } from "@/utils/emoji-processor";
 const user = useUserStore();
 const app = useAppStore();
 const replyRef = ref<any>([]);
@@ -311,6 +314,10 @@ const reloadReplies = (index: number) => {
 		// 隐藏查看更多
 		readMoreRef.value[index].style.display = "none";
 	});
+};
+// 添加一个计算属性处理评论内容
+const processContent = (content: string) => {
+	return cleanupContent(content);
 };
 onMounted(() => {
 	getList();

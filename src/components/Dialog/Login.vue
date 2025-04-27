@@ -153,7 +153,7 @@ const giteeLogin = () => {
 	app.setLoginFlag(false);
 	window.open(
 		"https://gitee.com/oauth/authorize?client_id=" +
-			config.GITEE_APP_ID +
+			config.GITEE_CLIENT_ID +
 			"&response_type=code&redirect_uri=" +
 			config.GITEE_REDIRECT_URL,
 		"_self"
